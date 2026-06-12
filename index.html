@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Site Básico</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <h1>Olá — Site Básico</h1>
+      <p>Exemplo mínimo publicado com GitHub Pages.</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Sobre</h2>
+        <p>Este é um site estático simples criado para demonstração.</p>
+      </section>
+      <section>
+        <h2>Contato</h2>
+        <form id="contact-form">
+          <label for="name">Nome</label>
+          <input id="name" name="name" required />
+          <label for="message">Mensagem</label>
+          <textarea id="message" name="message" required></textarea>
+          <button type="submit">Enviar</button>
+        </form>
+        <p id="response" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer>
+      <small>© 2026</small>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
