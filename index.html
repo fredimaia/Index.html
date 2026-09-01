@@ -1,65 +1,520 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Site Básico</title>
-    <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
-    <header>
-      <h1>Olá — Site Básico</h1>
-      <p>Exemplo mínimo publicado com GitHub Pages.</p>
-    </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadro de Equipes Operacionais</title>
+<!-- html2pdf bundle para exportação direta em PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#111a2e;
+    --panel-2:#0e1626;
+    --line:#22304a;
+    --text:#e6ecf5;
+    --text-dim:#8fa1bd;
+    --steel:#3b82f6;
+    --steel-dim:#1d4ed8;
+    --amber:#f59e0b;
+    --amber-dim:#b45309;
+    --danger:#ef4444;
+    --danger-dim:rgba(239, 68, 68, 0.15);
+    --ok:#10b981;
+    --radius:10px;
+    --mono:"SF Mono","Consolas","Menlo",monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(59,130,246,0.08), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(245,158,11,0.06), transparent 45%),
+      var(--bg);
+    color:var(--text);
+    padding:24px 16px 60px;
+    line-height:1.5;
+  }
+  .wrap{max-width:1100px; margin:0 auto;}
 
-    <section class="hero" aria-label="Frente com animal azul">
-      <div class="hero-inner">
-        <!-- SVG simples de um animal azul (elefante estilizado) -->
-        <svg width="280" height="180" viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="false">
-          <title>Elefante azul estilizado</title>
-          <rect width="100%" height="100%" fill="transparent"/>
-          <g transform="translate(10,30)">
-            <ellipse cx="120" cy="60" rx="90" ry="45" fill="#2b8cff" />
-            <circle cx="60" cy="35" r="30" fill="#2b8cff" />
-            <rect x="20" y="60" width="12" height="28" rx="4" fill="#2b8cff" />
-            <rect x="50" y="60" width="12" height="28" rx="4" fill="#2b8cff" />
-            <rect x="150" y="60" width="12" height="28" rx="4" fill="#2b8cff" />
-            <rect x="180" y="60" width="12" height="28" rx="4" fill="#2b8cff" />
-            <!-- Tromba -->
-            <path d="M78 45 q40 10 60 30 q-8 8 -18 6 q6 -18 -6 -28 q-18 -14 -36 -8" fill="#2b8cff" />
-            <!-- Olho -->
-            <circle cx="72" cy="30" r="4" fill="#fff" />
-            <circle cx="73" cy="31" r="2" fill="#111" />
-          </g>
-        </svg>
-        <div class="hero-text">
-          <h2>Animal Azul</h2>
-          <p>Um elefante azul estilizado na frente da página.</p>
+  /* ===== header ===== */
+  header{
+    display:flex; flex-wrap:wrap; gap:20px; justify-content:space-between; align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px; margin-bottom:22px;
+  }
+  header h1{
+    font-size:22px; font-weight:700; letter-spacing:-0.01em; color:#fff;
+  }
+  header .sub{color:var(--text-dim); font-size:13px; margin-top:4px; font-family:var(--mono);}
+  .stat-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .stat{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    padding:8px 14px; min-width:76px; text-align:center;
+  }
+  .stat .n{font-size:19px; font-weight:700; color:var(--steel); font-family:var(--mono);}
+  .stat .l{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px;}
+
+  /* ===== controls ===== */
+  .controls{
+    display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px;
+  }
+  .controls input[type=text]{
+    flex:1 1 220px; background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    padding:9px 12px; border-radius:7px; font-size:14px; outline:none;
+  }
+  .controls input[type=text]:focus{border-color:var(--steel);}
+  .controls select{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    padding:9px 12px; border-radius:7px; font-size:13px; outline:none; cursor:pointer;
+  }
+  .controls button{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim);
+    padding:9px 14px; border-radius:7px; font-size:13px; cursor:pointer; white-space:nowrap;
+    transition: all 0.2s ease;
+  }
+  .controls button:hover{color:var(--text); border-color:var(--steel);}
+  .controls button.btn-add{
+    background:rgba(59,130,246,0.15); border-color:var(--steel); color:#fff; font-weight:600;
+  }
+  .controls button.btn-add:hover{background:var(--steel);}
+  .controls button.btn-pdf{
+    background:rgba(245,158,11,0.15); border-color:var(--amber); color:#fff; font-weight:600;
+  }
+  .controls button.btn-pdf:hover{background:var(--amber); color:#000;}
+  .controls button.btn-reset{
+    background:transparent; border-color:transparent; color:var(--text-dim);
+  }
+  .controls button.btn-reset:hover{
+    border-color:var(--danger); color:var(--danger); background:var(--danger-dim);
+  }
+
+  /* ===== team card ===== */
+  .team{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:16px; overflow:hidden;
+  }
+  .team-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; cursor:pointer; user-select:none;
+    border-bottom:1px solid transparent;
+  }
+  .team-head:hover{background:rgba(59,130,246,0.05);}
+  .team-head .th-left{display:flex; align-items:center; gap:12px;}
+  .chevron{
+    width:9px; height:9px; border-right:2px solid var(--steel); border-bottom:2px solid var(--steel);
+    transform:rotate(-45deg); transition:transform .18s ease; flex-shrink:0;
+  }
+  .team.collapsed .chevron{transform:rotate(45deg);}
+  .team-head h2{font-size:15px; font-weight:600; color:#fff;}
+  .member-count{
+    background:rgba(59,130,246,0.14); color:var(--steel); border:1px solid rgba(59,130,246,0.3);
+    padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; font-family:var(--mono);
+  }
+  .team-body{
+    max-height:2000px; opacity:1; transition:max-height .25s ease, opacity .2s ease;
+    overflow:hidden;
+  }
+  .team.collapsed .team-body{max-height:0; opacity:0;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{
+    background:var(--panel-2); color:var(--text-dim); font-weight:600; text-align:left;
+    padding:9px 18px; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  }
+  td{padding:10px 18px; border-bottom:1px solid var(--line); color:var(--text);}
+  tr:last-child td{border-bottom:none;}
+  tr.row-hidden{display:none;}
+  tr:hover td{background:rgba(59,130,246,0.04);}
+  .col-name{font-weight:600; color:#fff;}
+  tr.row-lider td{background:rgba(245,158,11,0.06);}
+  tr.row-lider td:first-child{border-left:3px solid var(--amber); padding-left:15px;}
+  tr.row-lider .col-name{color:var(--amber);}
+  .lider-star{
+    display:inline-block; width:12px; height:12px; margin-right:7px; vertical-align:-1px;
+    color:var(--amber);
+  }
+  .matricula{font-family:var(--mono); color:var(--text-dim); font-size:12.5px;}
+  mark{background:rgba(245,158,11,0.35); color:#fff; border-radius:2px; padding:0 1px;}
+
+  /* ===== ação de exclusão ===== */
+  .cell-funcao{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+  }
+  .btn-remove-member{
+    background:transparent; border:1px solid transparent; color:var(--text-dim);
+    padding:4px 8px; border-radius:5px; cursor:pointer; font-size:12px;
+    transition:all 0.15s ease;
+  }
+  .btn-remove-member:hover{
+    background:var(--danger-dim); border-color:var(--danger); color:var(--danger);
+  }
+
+  .team-summary{
+    background:var(--panel-2); border-top:1px solid var(--line); padding:12px 18px;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  }
+  .summary-title{font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim); margin-right:4px;}
+  .badge{
+    background:rgba(59,130,246,0.1); color:#bcd3fb; border:1px solid rgba(59,130,246,0.25);
+    padding:4px 10px; border-radius:6px; font-size:12px; font-family:var(--mono);
+  }
+  .badge b{color:#fff;}
+  .badge-total{background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.3); color:var(--amber);}
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:var(--text-dim); font-size:14px;
+    border:1px dashed var(--line); border-radius:var(--radius); display:none;
+  }
+
+  footer{margin-top:24px; text-align:center; color:var(--text-dim); font-size:11px; font-family:var(--mono);}
+
+  /* ===== Estilos para PDF e Impressão ===== */
+  @media print{
+    body{background:#fff; color:#000;}
+    .controls, .chevron, footer, .btn-remove-member{display:none !important;}
+    .team.collapsed .team-body{max-height:none; opacity:1;}
+    .team{break-inside:avoid; border-color:#ccc; margin-bottom:12px;}
+  }
+
+  .pdf-mode{
+    background:#ffffff !important;
+    color:#111827 !important;
+    padding:10px !important;
+  }
+  .pdf-mode header{border-bottom:2px solid #e5e7eb;}
+  .pdf-mode header h1{color:#111827 !important;}
+  .pdf-mode .sub{color:#4b5563 !important;}
+  .pdf-mode .stat{background:#f3f4f6 !important; border-color:#e5e7eb !important;}
+  .pdf-mode .stat .n{color:#2563eb !important;}
+  .pdf-mode .stat .l{color:#6b7280 !important;}
+  .pdf-mode .team{background:#ffffff !important; border:1px solid #e5e7eb !important; page-break-inside:avoid; break-inside:avoid;}
+  .pdf-mode .team-head{background:#f9fafb !important; border-bottom:1px solid #e5e7eb !important;}
+  .pdf-mode .team-head h2{color:#111827 !important;}
+  .pdf-mode .member-count{background:#e0f2fe !important; color:#0369a1 !important; border-color:#bae6fd !important;}
+  .pdf-mode th{background:#f3f4f6 !important; color:#4b5563 !important; border-color:#e5e7eb !important;}
+  .pdf-mode td{color:#1f2937 !important; border-color:#e5e7eb !important;}
+  .pdf-mode .col-name{color:#111827 !important;}
+  .pdf-mode .matricula{color:#4b5563 !important;}
+  .pdf-mode tr.row-lider td{background:#fef3c7 !important;}
+  .pdf-mode tr.row-lider .col-name{color:#92400e !important;}
+  .pdf-mode .team-summary{background:#f9fafb !important; border-top:1px solid #e5e7eb !important;}
+  .pdf-mode .badge{background:#f3f4f6 !important; color:#1f2937 !important; border-color:#e5e7eb !important;}
+  .pdf-mode .badge b{color:#000 !important;}
+  .pdf-mode .badge-total{background:#fef3c7 !important; color:#92400e !important; border-color:#fde68a !important;}
+  .pdf-mode .controls, .pdf-mode .btn-remove-member, .pdf-mode .chevron, .pdf-mode footer{display:none !important;}
+
+  @media (max-width:600px){
+    .team-head{padding:12px 14px;}
+    th,td{padding:8px 12px;}
+    header{align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="printableContent">
+
+  <header>
+    <div>
+      <h1>Quadro de Equipes Operacionais</h1>
+      <div class="sub">estrutura de colaboradores &amp; totalização por função</div>
+    </div>
+    <div class="stat-row" id="statRow"></div>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Buscar por nome, função ou matrícula...">
+    <select id="funcaoFilter"><option value="">Todas as funções</option></select>
+    <button id="addTeamBtn" class="btn-add">+ Adicionar Equipe</button>
+    <button id="expandAllBtn">Expandir tudo</button>
+    <button id="collapseAllBtn">Recolher tudo</button>
+    <button id="pdfBtn" class="btn-pdf">Exportar PDF</button>
+    <button id="printBtn">Imprimir</button>
+    <button id="resetStorageBtn" class="btn-reset" title="Restaura os dados originais de fábrica">Restaurar Padrão</button>
+  </div>
+
+  <div id="teamsContainer"></div>
+  <div class="empty-state" id="emptyState">Nenhum colaborador encontrado para esse filtro.</div>
+
+  <footer>Quadro Geral de Equipes — dados salvos automaticamente no navegador</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'QUADRO_EQUIPES_DATA_V2';
+
+const DEFAULT_TEAMS = [
+  { lider:"Kennedy Vieira", members:[
+    {nome:"Kennedy Vieira", id:"40127124", matricula:"CBM 1208", funcao:"Líder", isLider:true},
+    {nome:"Tiago Barbosa", id:"40127947", matricula:"CBM 1741", funcao:"Mecânico"},
+    {nome:"Marcos Vinícius", id:"40134375", matricula:"CBM 4449", funcao:"Mecânico"},
+    {nome:"Neemias Leonardo", id:"40097234", matricula:"CBK 4699", funcao:"Soldador"},
+  ]},
+  { lider:"Agnaldo Primo", members:[
+    {nome:"Agnaldo Primo", id:"40081746", matricula:"CBM 7605", funcao:"Líder", isLider:true},
+    {nome:"Glaucio", id:"40123650", matricula:"CBL 9206", funcao:"Mecânico"},
+    {nome:"Iago Ribeiro", id:"40134372", matricula:"CBM 4446", funcao:"Mecânico"},
+    {nome:"Gabriel Moreira", id:"40134520", matricula:"CBM 4500", funcao:"Soldador"},
+    {nome:"Leandra de Oliveira", id:"40138287", matricula:"CBM 6172", funcao:"Mecânico"},
+  ]},
+  { lider:"Leandro de Sousa", members:[
+    {nome:"Leandro de Sousa", id:"40134882", matricula:"CBM 4685", funcao:"Líder", isLider:true},
+    {nome:"Diogo Vidal", id:"40103531", matricula:"CBK 8218", funcao:"Mecânico"},
+    {nome:"Eliano Martins", id:"40134788", matricula:"CBL 9718", funcao:"Mecânico"},
+    {nome:"Kethellin Vitoria", id:"40124492", matricula:"CBL 9583", funcao:"Soldador"},
+  ]},
+  { lider:"Matheus Barros", members:[
+    {nome:"Matheus Barros", id:"40132794", matricula:"CBM 3662", funcao:"Líder", isLider:true},
+    {nome:"Luiz Cláudio", id:"40100097", matricula:"CBK 6484", funcao:"Mecânico"},
+    {nome:"Stefany Pereira", id:"40134142", matricula:"CBM 4372", funcao:"Mecânico"},
+    {nome:"Eliane Lopes", id:"40135156", matricula:"CBM 4858", funcao:"Soldador"},
+  ]},
+  { lider:"Júnior Pereira", members:[
+    {nome:"Júnior Pereira", id:"40126780", matricula:"CBM 0958", funcao:"Líder", isLider:true},
+    {nome:"Arthur Martins", id:"40132984", matricula:"CBM 3749", funcao:"Mecânico"},
+    {nome:"Rafael de Souza", id:"40135067", matricula:"CBM 4826", funcao:"Mecânico"},
+    {nome:"Gabriel de Lima", id:"40117858", matricula:"CBL 6639", funcao:"Mecânico"},
+  ]},
+  { lider:"Silas Vinícius", members:[
+    {nome:"Silas Vinícius", id:"—", matricula:"CBL 2346", funcao:"Líder", isLider:true},
+    {nome:"Marcelo Paulo", id:"40110877", matricula:"CBL 2098", funcao:"Mecânico"},
+    {nome:"Tertuliano Costa", id:"40134333", matricula:"CBM 4428", funcao:"Mecânico"},
+    {nome:"Wilson Martins", id:"40134340", matricula:"CBM 4433", funcao:"Mecânico"},
+    {nome:"Lucas de Oliveira", id:"40059901", matricula:"CBI 8205", funcao:"Soldador"},
+    {nome:"Nilton Alves", id:"40077084", matricula:"CBJ 5484", funcao:"Mecânico"},
+    {nome:"Jonas Bezerra", id:"40134302", matricula:"CBM 4417", funcao:"Mecânico"},
+  ]},
+];
+
+function loadTeams(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    try{
+      return JSON.parse(saved);
+    }catch(e){
+      console.error("Erro ao ler LocalStorage:", e);
+    }
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_TEAMS));
+}
+
+function saveTeams(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(TEAMS));
+}
+
+let TEAMS = loadTeams();
+
+const container = document.getElementById('teamsContainer');
+const statRow = document.getElementById('statRow');
+const funcaoFilter = document.getElementById('funcaoFilter');
+const searchInput = document.getElementById('searchInput');
+const emptyState = document.getElementById('emptyState');
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function highlight(text, term){
+  if(!term) return escapeHtml(text);
+  const idx = text.toLowerCase().indexOf(term.toLowerCase());
+  if(idx === -1) return escapeHtml(text);
+  return escapeHtml(text.slice(0,idx)) + '<mark>' + escapeHtml(text.slice(idx, idx+term.length)) + '</mark>' + escapeHtml(text.slice(idx+term.length));
+}
+
+function updateFuncaoFilterOptions(){
+  const curVal = funcaoFilter.value;
+  const allFuncoes = [...new Set(TEAMS.flatMap(t => t.members.map(m => m.funcao)))].filter(Boolean).sort();
+  funcaoFilter.innerHTML = '<option value="">Todas as funções</option>';
+  allFuncoes.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f; opt.textContent = f;
+    if(f === curVal) opt.selected = true;
+    funcaoFilter.appendChild(opt);
+  });
+}
+
+function updateHeaderStats(){
+  const totalColab = TEAMS.reduce((s,t) => s + t.members.length, 0);
+  const allFuncoes = [...new Set(TEAMS.flatMap(t => t.members.map(m => m.funcao)))].filter(Boolean);
+  statRow.innerHTML = `
+    <div class="stat"><div class="n">${TEAMS.length}</div><div class="l">Equipes</div></div>
+    <div class="stat"><div class="n">${totalColab}</div><div class="l">Colaboradores</div></div>
+    <div class="stat"><div class="n">${allFuncoes.length}</div><div class="l">Funções</div></div>
+  `;
+}
+
+function funcaoCounts(members){
+  const map = {};
+  members.forEach(m => map[m.funcao] = (map[m.funcao]||0) + 1);
+  return map;
+}
+
+function removeMember(teamIndex, memberIndex){
+  const member = TEAMS[teamIndex].members[memberIndex];
+  if(confirm(`Deseja remover ${member.nome} da equipe?`)){
+    TEAMS[teamIndex].members.splice(memberIndex, 1);
+    saveTeams();
+    updateFuncaoFilterOptions();
+    updateHeaderStats();
+    renderTeams();
+  }
+}
+
+function renderTeams(){
+  container.innerHTML = '';
+  const term = searchInput.value.trim().toLowerCase();
+  const funcaoSel = funcaoFilter.value;
+  let anyVisible = false;
+
+  TEAMS.forEach((team, ti) => {
+    const rowsHtml = team.members.map((m, mi) => {
+      const matches = (!term || m.nome.toLowerCase().includes(term) || m.funcao.toLowerCase().includes(term) || m.matricula.toLowerCase().includes(term))
+                      && (!funcaoSel || m.funcao === funcaoSel);
+      if(matches) anyVisible = true;
+      const star = m.isLider ? '<svg class="lider-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7-5.4-4.7 7.1-.6z"/></svg>' : '';
+      return `<tr class="${matches ? '' : 'row-hidden'} ${m.isLider ? 'row-lider' : ''}">
+        <td class="col-name">${star}${highlight(m.nome, term)}</td>
+        <td class="matricula">${escapeHtml(m.id)}</td>
+        <td class="matricula">${highlight(m.matricula, term)}</td>
+        <td>
+          <div class="cell-funcao">
+            <span>${highlight(m.funcao, term)}</span>
+            <button class="btn-remove-member" title="Remover colaborador" onclick="removeMember(${ti}, ${mi})">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const teamHasMatch = team.members.length === 0 || team.members.some(m =>
+      (!term || m.nome.toLowerCase().includes(term) || m.funcao.toLowerCase().includes(term) || m.matricula.toLowerCase().includes(term))
+      && (!funcaoSel || m.funcao === funcaoSel)
+    );
+
+    if (team.members.length === 0 && !term && !funcaoSel) {
+      anyVisible = true;
+    }
+
+    const counts = funcaoCounts(team.members);
+    const badgesHtml = Object.entries(counts).map(([f,c]) =>
+      `<div class="badge">${escapeHtml(f)} <b>${c}</b></div>`
+    ).join('') + `<div class="badge badge-total">Total Equipe <b>${team.members.length}</b></div>`;
+
+    const div = document.createElement('div');
+    div.className = 'team' + (teamHasMatch ? '' : ' row-hidden');
+    div.innerHTML = `
+      <div class="team-head" data-idx="${ti}">
+        <div class="th-left">
+          <span class="chevron"></span>
+          <h2>Equipe ${ti + 1}${team.lider ? ` — ${escapeHtml(team.lider)}` : ''}</h2>
         </div>
+        <span class="member-count">${team.members.length} Colaboradores</span>
       </div>
-    </section>
+      <div class="team-body">
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>Nome</th><th>ID</th><th>Matrícula</th><th>Função</th></tr></thead>
+            <tbody>
+              ${team.members.length > 0 ? rowsHtml : '<tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding:16px;">Equipe sem colaboradores cadastrados.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+        <div class="team-summary">
+          <span class="summary-title">Quantitativo por Função</span>
+          ${badgesHtml}
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
 
-    <main>
-      <section>
-        <h2>Sobre</h2>
-        <p>Este é um site estático simples criado para demonstração.</p>
-      </section>
-      <section>
-        <h2>Contato</h2>
-        <form id="contact-form">
-          <label for="name">Nome</label>
-          <input id="name" name="name" required />
-          <label for="message">Mensagem</label>
-          <textarea id="message" name="message" required></textarea>
-          <button type="submit">Enviar</button>
-        </form>
-        <p id="response" aria-live="polite"></p>
-      </section>
-    </main>
+  emptyState.style.display = anyVisible ? 'none' : 'block';
 
-    <footer>
-      <small>© 2026</small>
-    </footer>
-    <script src="script.js"></script>
-  </body>
+  container.querySelectorAll('.team-head').forEach(head => {
+    head.addEventListener('click', (e) => {
+      if (e.target.tagName.toLowerCase() === 'button') return;
+      head.closest('.team').classList.toggle('collapsed');
+    });
+  });
+}
+
+document.getElementById('addTeamBtn').addEventListener('click', () => {
+  const lider = prompt("Nome do Líder da nova equipe (opcional):");
+  if (lider === null) return;
+  
+  const newTeam = {
+    lider: lider.trim(),
+    members: []
+  };
+
+  if (lider.trim()) {
+    newTeam.members.push({
+      nome: lider.trim(),
+      id: "—",
+      matricula: "—",
+      funcao: "Líder",
+      isLider: true
+    });
+  }
+
+  TEAMS.push(newTeam);
+  saveTeams();
+  updateFuncaoFilterOptions();
+  updateHeaderStats();
+  renderTeams();
+});
+
+document.getElementById('resetStorageBtn').addEventListener('click', () => {
+  if(confirm("Tem certeza que deseja restaurar as equipes para o padrão original? Todas as alterações manuais serão descartadas.")){
+    localStorage.removeItem(STORAGE_KEY);
+    TEAMS = loadTeams();
+    updateFuncaoFilterOptions();
+    updateHeaderStats();
+    renderTeams();
+  }
+});
+
+// Exportação para PDF formatado
+document.getElementById('pdfBtn').addEventListener('click', () => {
+  const element = document.getElementById('printableContent');
+  
+  // Expandir todas as equipes antes de exportar
+  container.querySelectorAll('.team').forEach(t => t.classList.remove('collapsed'));
+  
+  // Ativar classe para formatação de impressão em alta definição e fundo claro
+  document.body.classList.add('pdf-mode');
+
+  const opt = {
+    margin:       [10, 10, 10, 10],
+    filename:     'Quadro_de_Equipes_Operacionais.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    document.body.classList.remove('pdf-mode');
+  }).catch(err => {
+    console.error("Erro ao gerar PDF:", err);
+    document.body.classList.remove('pdf-mode');
+  });
+});
+
+searchInput.addEventListener('input', renderTeams);
+funcaoFilter.addEventListener('change', renderTeams);
+
+document.getElementById('expandAllBtn').addEventListener('click', () => {
+  container.querySelectorAll('.team').forEach(t => t.classList.remove('collapsed'));
+});
+document.getElementById('collapseAllBtn').addEventListener('click', () => {
+  container.querySelectorAll('.team').forEach(t => t.classList.add('collapsed'));
+});
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+updateFuncaoFilterOptions();
+updateHeaderStats();
+renderTeams();
+</script>
+</body>
 </html>
